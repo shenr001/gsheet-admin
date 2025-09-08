@@ -1,11 +1,10 @@
 const dataCol = 1 ;                     // Column containing unique user IDs - 1 (A) using default layout 
-const startRow = 7;                     // Row number containing the first ID - 7 using default layout
+const startRow = 5;                     // Row number containing the first ID - 5 using default layout
 const listSheetName = "Create-Share";   // Name of worksheet tab containing user data
-//const templateID = "1OfOsEODmX1S5EAoBY26DATy0WZKNRXXLyi3-2bQ4kms" 
-var functionNumber = 11;
-//var ui = SpreadsheetApp.getUi();
 
-function getNumRows(listSheet) {
+var functionNumber = 99;
+
+function getNumRows(listSheet) {        // Function to determine the number of data rows (students)    
 
   var IDlist = listSheet.getRange(startRow,dataCol).getDataRegion(SpreadsheetApp.Dimension.ROWS).getA1Notation();
   var numRows = listSheet.getRange(IDlist).getLastRow() - (startRow - 1);
@@ -16,16 +15,16 @@ function getNumRows(listSheet) {
 
 
 function createTemplates(functionNumber) {
-  // comment out the next line to run the script!
-  //return; // do not execute... files have been created for current semester
+   
   
-  
-
   var list = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(listSheetName);
   var numRows = getNumRows(list);
-  var templateURL=list.getRange("E1").getValue();
+  var templateURL=list.getRange("B3").getValue();
   Logger.log(templateURL);
   var ss = SpreadsheetApp.openByUrl(templateURL); 
+
+  var processList = [];
+
 
   // Fetch the range of cells
   var dataRange = list.getRange(startRow, 1, numRows, 4)
@@ -34,10 +33,10 @@ function createTemplates(functionNumber) {
 
   for (var i = 0; i < data.length; ++i) {
     var row = data[i];
-    var netId = row[0];  // First column
-    var email = row[1];
-    var processFlag = row[2];
-    var newFile = row[3];
+    var netId = row[0];        // Column A - user ID
+    var email = row[1];        // Column B - user email address (must be GMail powered)
+    var processFlag = row[2];  // Column C - checkbox for inclusion in processing
+    var newFile = row[3];      // Column D - Filename constructed from userid, CourseID, and ProjectID
     Logger.log(row);
 
     if(processFlag) {
@@ -65,7 +64,7 @@ function createTemplates(functionNumber) {
         case 2:
           Logger.log("Boo!")
           break;
-        case 3: // remove sharing permission from editors
+        case 3: // ============ remove sharing permission from editors ===========
           var ss2 = DriveApp.getFilesByName(newFile) ;
           while (ss2.hasNext()) {
             var temp=ss2.next();
@@ -76,27 +75,25 @@ function createTemplates(functionNumber) {
           }
           Logger.log("Boo!")
           break;
-        case 4: // add editor access
+        case 4: // =========== add editor access ================================
           var ss2 = DriveApp.getFilesByName(newFile) ;
           while (ss2.hasNext()) {
             var temp=ss2.next();
-            temp.removeEditor(email);
-            //temp.addEditor(email);
+            temp.addEditor(email);
             Logger.log(temp.getEditors());
           }
           break;
 
-        case 5: // remove editor access
+        case 5: // ========== revoke editor access ==============================
           var ss2 = DriveApp.getFilesByName(newFile) ;
           while (ss2.hasNext()) {
             var temp=ss2.next();
             temp.removeEditor(email);
-            //temp.addEditor(email);
             Logger.log(temp.getEditors());
           }
           break;
 
-        case 6: //insert sheet
+        case 6: // ========== insert sheet ===================================== 
           const sheetName = "Risk Analysis"; //should be in the template file identified on the worksheet
           var source = ss.getSheetByName(sheetName);       
           var ss2 = DriveApp.getFilesByName(newFile) ;
@@ -106,7 +103,7 @@ function createTemplates(functionNumber) {
           }
           break;
 
-        case 7: // add viewer access
+        case 7: // ========== add viewer access ===============================
           var ss2 = DriveApp.getFilesByName(newFile) ;
           while (ss2.hasNext()) {
             var temp=ss2.next();
@@ -117,7 +114,17 @@ function createTemplates(functionNumber) {
           }
           break;
 
-        case 10:  // retrieve grade
+        case 8: // ========== revoke viewer access ===============================
+          var ss2 = DriveApp.getFilesByName(newFile) ;
+          while (ss2.hasNext()) {
+            var temp=ss2.next();
+            temp.removeViewer(email);
+            Logger.log(temp.getEditors());
+            Logger.log(email)
+          }
+          break;  
+
+        case 10:  // ========= retrieve grade =================================
           var ss2 = DriveApp.getFilesByName(newFile) ;
           while (ss2.hasNext()) {
           var spreadsheet = SpreadsheetApp.open(ss2.next());
@@ -128,7 +135,7 @@ function createTemplates(functionNumber) {
           }
           break;
 
-        case 11:  // get last update and share status
+        case 11:  // ========== get last update and share status ===============
           var ss2 = DriveApp.getFilesByName(newFile) ;
           while (ss2.hasNext()) {
           var item=ss2.next(); 
@@ -143,13 +150,18 @@ function createTemplates(functionNumber) {
 
         default:
         Logger.log("Invalid function number "+functionNumber);
-
+      
+    
       }
-    }
+      
+      processList[i]=netId;
+
+     }
 
 
   }
-
+  // Present an alert box with a list of user IDs processed
+  SpreadsheetApp.getUi().alert('Users Processed:'+processList.toString());
 
   // Make sure the cell is updated right away in case the script is interrupted
   SpreadsheetApp.flush();
@@ -190,3 +202,9 @@ function addEditAccess() {
   createTemplates(4);
   return;
 }
+
+function testConfBox() {
+  var zz=confirmYN();
+  Logger.log(zz);
+}
+
