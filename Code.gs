@@ -1,3 +1,8 @@
+/*
+GScript code to accompany the article "USING THE GOOGLE SHEETS PLATFORM FOR INTERACTIVE SPREADSHEET ASSIGNMENTS"
+Free for academic use.
+*/
+
 const dataCol = 1 ;                     // Column containing unique user IDs - 1 (A) using default layout 
 const startRow = 5;                     // Row number containing the first ID - 5 using default layout
 const listSheetName = "Create-Share";   // Name of worksheet tab containing user data
@@ -141,9 +146,8 @@ function createTemplates(functionNumber) {
           var item=ss2.next(); 
           list.getRange(startRow + i, 5).setValue(item.getLastUpdated());
           list.getRange(startRow + i, 6).setValue(item.getAccess(netId+'@plattsburgh.edu')); 
-          //list.getRange(startRow + i, 7).setValue('=HYPERLINK("'+item.getUrl()+'","[LINK]")');
-          list.getRange(startRow + i, 7).setValue('=HYPERLINK("'+item.getUrl()+'#gid=1369031038'+'","[LINK]")');
-          //list.getRange(startRow + i, 7).setValue('=HYPERLINK("'+item.getUrl()+'#gid=1796068497'+'","[LINK]")');
+          list.getRange(startRow + i, 7).setValue('=HYPERLINK("'+item.getUrl()+'","[LINK]")');
+          
           }
           break;
 
@@ -203,8 +207,93 @@ function addEditAccess() {
   return;
 }
 
+function onOpen() {
+  var ui = SpreadsheetApp.getUi();
+  // Or DocumentApp or FormApp.
+  ui.createMenu('GSheetsAdmin')
+      .addItem('Create Files', 'menuItem1')
+      .addItem('Update File Info and Links', 'menuItem2')
+      .addItem('Retrieve Grades', 'menuItem3')
+      .addItem('Share Solution file','menuItem4')
+      .addSeparator()
+      .addSubMenu(ui.createMenu('Modify file permissions')
+          .addItem('Grant editor access', 'menu2Item1')
+          .addItem('Grant viewer access', 'menu2Item2')
+          .addItem('Revoke editor access', 'menu2Item3')
+          .addItem('Revoke viewer access', 'menu2Item4')
+          .addItem('Revoke sharing permission', 'menu2Item5'))
+      .addToUi();
+}
+
+function menuItem1() { //Create template files
+  if (confirmYN()==1) {
+    SpreadsheetApp.getUi().alert('Creating files!');
+    createTemplates(1);
+    return;
+  }
+}
+
+function menuItem2() { // Update file info and links, 
+  createTemplates(11);
+  return;
+
+}
+
+function menuItem3() {  // Retrieve grades or other info 
+  createTemplates(5);
+  return;
+}
+function menuItem4() {  // Share solution 
+  createTemplates(5);
+  return;
+}
+function menu2Item1() { // Grant editor access
+  createTemplates(4);
+  return;
+}
+
+function menu2Item2() { // Grant viewer access
+  createTemplates(7);
+  return;
+}
+
+function menu2Item3() { // Revoke editor access
+  createTemplates(5);
+  return;
+}
+
+function menu2Item4() { // Revoke viewer access
+  createTemplates(8);
+  return;
+}
+
+function menu2Item5() { // Revoke sharing permission
+  createTemplates(3);
+  return;
+}
+
+function confirmYN() {
+// Display a dialog box with a message and "Yes" and "No" buttons. The user can
+// also close the dialog by clicking the close button in its title bar.
+const ui = SpreadsheetApp.getUi();
+const response = ui.alert(
+    'Are you sure you want to continue?',
+    ui.ButtonSet.YES_NO,
+);
+
+// Process the user's response.
+if (response === ui.Button.YES) {
+  Logger.log('The user clicked "Yes."');
+  return(1);
+} else {
+  Logger.log(
+      'The user clicked "No" or the close button in the dialog\'s title bar.',
+  );
+  return(0);
+}  
+}
+
 function testConfBox() {
   var zz=confirmYN();
   Logger.log(zz);
 }
-
