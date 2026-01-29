@@ -67,7 +67,7 @@ function createTemplates(functionNumber) {
 
 
         case 2:
-          Logger.log("Boo!")
+          Logger.log("Reserved")
           break;
         case 3: // ============ remove sharing permission from editors ===========
           var ss2 = DriveApp.getFilesByName(newFile) ;
@@ -78,7 +78,7 @@ function createTemplates(functionNumber) {
             temp.setShareableByEditors(false);
             Logger.log(temp.getEditors());
           }
-          Logger.log("Boo!")
+          Logger.log("===")
           break;
         case 4: // =========== add editor access ================================
           var ss2 = DriveApp.getFilesByName(newFile) ;
@@ -99,7 +99,7 @@ function createTemplates(functionNumber) {
           break;
 
         case 6: // ========== insert sheet ===================================== 
-          const sheetName = "Risk Analysis"; //should be in the template file identified on the worksheet
+          const sheetName = "New Sheet"; //should be in the template file identified on the worksheet
           var source = ss.getSheetByName(sheetName);       
           var ss2 = DriveApp.getFilesByName(newFile) ;
           while (ss2.hasNext()) {
